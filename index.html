@@ -14,31 +14,56 @@ font-family:Arial;
 color:white;
 }
 
-#score{
-position:fixed;
-top:20px;
-left:20px;
-font-size:30px;
-}
+/* UI */
 
-#gameover{
+#menu, #gameover{
 position:fixed;
 top:50%;
 left:50%;
 transform:translate(-50%,-50%);
-font-size:60px;
+text-align:center;
+}
+
+button{
+padding:15px 30px;
+font-size:20px;
+cursor:pointer;
+border:none;
+border-radius:10px;
+}
+
+#score{
+position:fixed;
+top:20px;
+left:20px;
+font-size:28px;
 display:none;
-color:red;
+}
+
+#gameover{
+display:none;
+}
+
+canvas{
+display:block;
 }
 
 </style>
-
 </head>
 
 <body>
 
+<div id="menu">
+<h1>🌍 Salve a Terra</h1>
+<button onclick="startGame()">Jogar</button>
+</div>
+
 <div id="score">Score: 0</div>
-<div id="gameover">💥 A TERRA EXPLODIU</div>
+
+<div id="gameover">
+<h1>💥 A Terra Explodiu</h1>
+<button onclick="restartGame()">Jogar Novamente</button>
+</div>
 
 <canvas id="game"></canvas>
 
@@ -63,8 +88,6 @@ renderer.setSize(window.innerWidth,window.innerHeight)
 
 camera.position.z = 20
 
-// luz
-
 const light = new THREE.PointLight(0xffffff,2)
 light.position.set(10,10,10)
 scene.add(light)
@@ -83,9 +106,11 @@ const earth = new THREE.Mesh(earthGeo,earthMat)
 scene.add(earth)
 
 
-// mover terra com mouse
+// mover terra
 
 document.addEventListener("mousemove",(e)=>{
+
+if(!running) return
 
 const x = (e.clientX/window.innerWidth)*2-1
 const y = -(e.clientY/window.innerHeight)*2+1
@@ -96,38 +121,10 @@ earth.position.y = y*6
 })
 
 
-// METEOROS
-
-let meteors = []
-
-function spawnMeteor(){
-
-const geo = new THREE.SphereGeometry(1,16,16)
-
-const mat = new THREE.MeshStandardMaterial({
-color:0x777777
-})
-
-const meteor = new THREE.Mesh(geo,mat)
-
-meteor.position.x = (Math.random()-0.5)*20
-meteor.position.y = 15
-
-meteor.speed = 0.15 + Math.random()*0.2
-
-scene.add(meteor)
-
-meteors.push(meteor)
-
-}
-
-setInterval(spawnMeteor,700)
-
-
-// ESTRELAS
+// estrelas
 
 const starsGeo = new THREE.BufferGeometry()
-const starVerts = []
+const starVerts=[]
 
 for(let i=0;i<5000;i++){
 
@@ -151,84 +148,157 @@ const stars = new THREE.Points(starsGeo,starsMat)
 scene.add(stars)
 
 
-// EXPLOSÃO
+// meteoros
 
-let explosionParticles = []
+let meteors=[]
+let spawnRate=1200
+let meteorSpeed=0.1
 
-function createExplosion(x,y){
+
+function spawnMeteor(){
+
+if(!running) return
+
+const geo = new THREE.SphereGeometry(1,16,16)
+
+const mat = new THREE.MeshStandardMaterial({
+color:0x777777
+})
+
+const meteor = new THREE.Mesh(geo,mat)
+
+meteor.position.x=(Math.random()-0.5)*20
+meteor.position.y=15
+
+meteor.speed=meteorSpeed+Math.random()*0.2
+
+scene.add(meteor)
+
+meteors.push(meteor)
+
+}
+
+let spawnLoop
+
+
+// explosão
+
+let particles=[]
+
+function explosion(x,y){
 
 for(let i=0;i<200;i++){
 
-const geo = new THREE.SphereGeometry(0.1,8,8)
+const geo=new THREE.SphereGeometry(0.1,8,8)
 
-const mat = new THREE.MeshBasicMaterial({
+const mat=new THREE.MeshBasicMaterial({
 color:0xffaa00
 })
 
-const p = new THREE.Mesh(geo,mat)
+const p=new THREE.Mesh(geo,mat)
 
 p.position.set(x,y,0)
 
-p.vx = (Math.random()-0.5)*1
-p.vy = (Math.random()-0.5)*1
+p.vx=(Math.random()-0.5)*1
+p.vy=(Math.random()-0.5)*1
 
 scene.add(p)
 
-explosionParticles.push(p)
+particles.push(p)
 
 }
 
 }
-
-
-// SCORE
-
-let score = 0
-let gameOver = false
-
-const scoreUI = document.getElementById("score")
 
 
 // colisão
 
-function checkCollision(a,b){
+function collision(a,b){
 
-const dx = a.position.x - b.position.x
-const dy = a.position.y - b.position.y
+const dx=a.position.x-b.position.x
+const dy=a.position.y-b.position.y
 
-const dist = Math.sqrt(dx*dx + dy*dy)
+const dist=Math.sqrt(dx*dx+dy*dy)
 
-return dist < 3
+return dist<3
 
 }
 
 
-// LOOP
+// jogo
+
+let score=0
+let running=false
+
+const scoreUI=document.getElementById("score")
+
+function startGame(){
+
+document.getElementById("menu").style.display="none"
+
+scoreUI.style.display="block"
+
+running=true
+
+spawnLoop=setInterval(spawnMeteor,spawnRate)
+
+}
+
+function restartGame(){
+
+location.reload()
+
+}
+
+
+// dificuldade progressiva
+
+function updateDifficulty(){
+
+let level=Math.floor(score/100)
+
+meteorSpeed=0.1+level*0.05
+
+spawnRate=1200-level*80
+
+if(spawnRate<300) spawnRate=300
+
+clearInterval(spawnLoop)
+
+spawnLoop=setInterval(spawnMeteor,spawnRate)
+
+}
+
+
+// loop
 
 function animate(){
 
 requestAnimationFrame(animate)
 
-if(!gameOver){
+if(running){
 
-score += 0.1
-scoreUI.innerText = "Score: " + Math.floor(score)
+score+=0.1
+
+scoreUI.innerText="Score: "+Math.floor(score)
+
+updateDifficulty()
 
 }
 
-earth.rotation.y += 0.01
+earth.rotation.y+=0.01
 
 meteors.forEach((m)=>{
 
-m.position.y -= m.speed
+m.position.y-=m.speed
 
-if(checkCollision(earth,m) && !gameOver){
+if(collision(earth,m)&&running){
 
-gameOver = true
+running=false
 
-createExplosion(earth.position.x,earth.position.y)
+explosion(earth.position.x,earth.position.y)
 
-earth.visible = false
+earth.visible=false
 
 document.getElementById("gameover").style.display="block"
 
@@ -236,14 +306,14 @@ document.getElementById("gameover").style.display="block"
 
 })
 
-explosionParticles.forEach((p)=>{
+particles.forEach((p)=>{
 
-p.position.x += p.vx
-p.position.y += p.vy
+p.position.x+=p.vx
+p.position.y+=p.vy
 
 })
 
-stars.rotation.y += 0.0005
+stars.rotation.y+=0.0005
 
 renderer.render(scene,camera)
 
