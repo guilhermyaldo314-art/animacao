@@ -38,10 +38,6 @@ font-size:28px;
 display:none;
 }
 
-#gameover{
-display:none;
-}
-
 </style>
 </head>
 
@@ -54,7 +50,7 @@ display:none;
 
 <div id="score">Score: 0</div>
 
-<div id="gameover">
+<div id="gameover" style="display:none;">
 <h1>💥 A Terra Explodiu</h1>
 <button onclick="restartGame()">Jogar Novamente</button>
 </div>
@@ -150,9 +146,7 @@ scene.add(stars)
 // METEOROS
 
 let meteors=[]
-
 let meteorBaseSpeed=0.05
-
 
 function spawnMeteor(){
 
@@ -177,7 +171,35 @@ meteors.push(meteor)
 
 }
 
-setInterval(spawnMeteor,900)
+setInterval(spawnMeteor,1800)
+
+
+// MÍSSEIS
+
+let missiles=[]
+
+function shootMissile(target){
+
+const geo=new THREE.CylinderGeometry(0.1,0.1,1,8)
+
+const mat=new THREE.MeshBasicMaterial({
+color:0xff0000
+})
+
+const missile=new THREE.Mesh(geo,mat)
+
+missile.position.x=earth.position.x
+missile.position.y=earth.position.y
+
+missile.target=target
+
+missile.speed=0.08 // BEM LENTO
+
+scene.add(missile)
+
+missiles.push(missile)
+
+}
 
 
 // EXPLOSÃO
@@ -219,7 +241,7 @@ const dy=a.position.y-b.position.y
 
 const dist=Math.sqrt(dx*dx+dy*dy)
 
-return dist<3
+return dist<2
 
 }
 
@@ -227,6 +249,7 @@ return dist<3
 // JOGO
 
 let score=0
+let level=1
 let running=false
 
 const scoreUI=document.getElementById("score")
@@ -258,18 +281,33 @@ if(running){
 
 score+=0.1
 
-scoreUI.innerText="Score: "+Math.floor(score)
+level=Math.floor(score/500)+1
 
-// aumenta velocidade lentamente
+scoreUI.innerText="Score: "+Math.floor(score)+" | Level: "+level
+
 meteorBaseSpeed=0.05+score*0.00005
 
 }
 
 earth.rotation.y+=0.01
 
-meteors.forEach((m)=>{
+
+// METEOROS
+
+meteors.forEach((m,i)=>{
 
 m.position.y-=m.speed
+
+// se estiver perto da terra dispara defesa
+const dx=earth.position.x-m.position.x
+const dy=earth.position.y-m.position.y
+const dist=Math.sqrt(dx*dx+dy*dy)
+
+if(dist<6 && running && Math.random()<0.02){
+
+shootMissile(m)
+
+}
 
 if(collision(earth,m)&&running){
 
@@ -284,6 +322,40 @@ document.getElementById("gameover").style.display="block"
 }
 
 })
+
+
+// MOVER MÍSSEIS
+
+missiles.forEach((ms,mi)=>{
+
+if(!ms.target) return
+
+const dx=ms.target.position.x-ms.position.x
+const dy=ms.target.position.y-ms.position.y
+
+ms.position.x+=dx*0.02
+ms.position.y+=dy*0.02
+
+if(collision(ms,ms.target)){
+
+createExplosion(ms.target.position.x,ms.target.position.y)
+
+scene.remove(ms.target)
+
+meteors=meteors.filter(m=>m!==ms.target)
+
+scene.remove(ms)
+
+missiles.splice(mi,1)
+
+score+=20
+
+}
+
+})
+
+
+// PARTÍCULAS
 
 particles.forEach((p)=>{
 
