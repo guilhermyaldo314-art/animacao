@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<title>Cosmic Experience</title>
+
+<style>
+
+body{
+margin:0;
+overflow-x:hidden;
+font-family:Arial;
+background:black;
+color:white;
+}
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-1;
+}
+
+section{
+height:100vh;
+display:flex;
+align-items:center;
+justify-content:center;
+text-align:center;
+font-size:50px;
+}
+
+h1{
+font-size:60px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<canvas id="bg"></canvas>
+
+<section>
+<h1>🌌 Universo Interativo</h1>
+</section>
+
+<section>
+<h1>🪐 Explore o espaço</h1>
+</section>
+
+<section>
+<h1>🚀 Continue rolando</h1>
+</section>
+
+<section>
+<h1>✨ Fim da jornada</h1>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+
+const scene = new THREE.Scene()
+
+const camera = new THREE.PerspectiveCamera(
+75,
+window.innerWidth/window.innerHeight,
+0.1,
+1000
+)
+
+const renderer = new THREE.WebGLRenderer({
+canvas: document.querySelector("#bg")
+})
+
+renderer.setSize(window.innerWidth,window.innerHeight)
+
+camera.position.z = 30
+
+// estrelas
+
+const starGeometry = new THREE.BufferGeometry()
+const starVertices = []
+
+for(let i=0;i<10000;i++){
+
+const x = (Math.random()-0.5)*2000
+const y = (Math.random()-0.5)*2000
+const z = (Math.random()-0.5)*2000
+
+starVertices.push(x,y,z)
+
+}
+
+starGeometry.setAttribute(
+"position",
+new THREE.Float32BufferAttribute(starVertices,3)
+)
+
+const starMaterial = new THREE.PointsMaterial({
+color:0xffffff
+})
+
+const stars = new THREE.Points(starGeometry,starMaterial)
+
+scene.add(stars)
+
+
+// planeta
+
+const planetGeometry = new THREE.SphereGeometry(5,32,32)
+
+const planetMaterial = new THREE.MeshStandardMaterial({
+color:0x3366ff
+})
+
+const planet = new THREE.Mesh(planetGeometry,planetMaterial)
+
+planet.position.x = 20
+
+scene.add(planet)
+
+
+// luz
+
+const light = new THREE.PointLight(0xffffff,2)
+
+light.position.set(20,20,20)
+
+scene.add(light)
+
+
+// nave seguindo mouse
+
+const shipGeometry = new THREE.ConeGeometry(0.5,2,8)
+
+const shipMaterial = new THREE.MeshStandardMaterial({
+color:0xff0000
+})
+
+const ship = new THREE.Mesh(shipGeometry,shipMaterial)
+
+scene.add(ship)
+
+
+// mouse
+
+document.addEventListener("mousemove",(event)=>{
+
+const x = (event.clientX/window.innerWidth)*2-1
+const y = -(event.clientY/window.innerHeight)*2+1
+
+ship.position.x = x*20
+ship.position.y = y*10
+
+})
+
+
+// scroll animação
+
+document.body.onscroll = () => {
+
+const t = document.body.getBoundingClientRect().top
+
+camera.position.z = 30 + t * -0.02
+planet.rotation.y += 0.05
+
+}
+
+
+// animação
+
+function animate(){
+
+requestAnimationFrame(animate)
+
+stars.rotation.y += 0.0005
+planet.rotation.y += 0.002
+
+renderer.render(scene,camera)
+
+}
+
+animate()
+
+</script>
+
+</body>
+</html>
