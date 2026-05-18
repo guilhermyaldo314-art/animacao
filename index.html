@@ -238,62 +238,6 @@ header p{
 
 }
 
-.win-screen{
-  position:fixed;
-  inset:0;
-
-  background:rgba(0,0,0,0.85);
-
-  display:none;
-  justify-content:center;
-  align-items:center;
-}
-
-.win-box{
-  width:90%;
-  max-width:500px;
-
-  padding:40px;
-
-  border-radius:30px;
-
-  background:#0f172a;
-
-  text-align:center;
-}
-
-.win-box h2{
-  font-size:3rem;
-
-  margin-bottom:20px;
-}
-
-.win-box p{
-  margin-bottom:20px;
-
-  color:#cbd5e1;
-}
-
-.results{
-  margin-bottom:20px;
-
-  line-height:2;
-}
-
-.win-box button{
-  padding:18px 35px;
-
-  border:none;
-
-  border-radius:20px;
-
-  background:#22c55e;
-
-  color:white;
-
-  cursor:pointer;
-}
-
 @media(max-width:900px){
 
   .game-board{
@@ -329,16 +273,11 @@ header p{
 
   <h1>🎨 Memória Artística PRO</h1>
 
-  <p>Impressionismo & Realismo</p>
+  <p>Encontre grupos de imagens iguais</p>
 
 </header>
 
 <section class="dashboard">
-
-  <div class="card-info">
-    <span>⏱ Tempo</span>
-    <h2 id="timer">00:00</h2>
-  </div>
 
   <div class="card-info">
     <span>🏆 Pontos</span>
@@ -346,13 +285,13 @@ header p{
   </div>
 
   <div class="card-info">
-    <span>🎯 Tentativas</span>
-    <h2 id="moves">0</h2>
+    <span>🎯 Nível</span>
+    <h2 id="level">1</h2>
   </div>
 
   <div class="card-info">
-    <span>🔥 Nível</span>
-    <h2 id="level">1</h2>
+    <span>🧩 Iguais</span>
+    <h2 id="difficulty">2</h2>
   </div>
 
   <button id="restartBtn">
@@ -362,24 +301,6 @@ header p{
 </section>
 
 <section class="game-board" id="gameBoard"></section>
-
-<div class="win-screen" id="winScreen">
-
-  <div class="win-box">
-
-    <h2>🏆 Vitória!</h2>
-
-    <p>Você encontrou todos os pares.</p>
-
-    <div class="results" id="finalStats"></div>
-
-    <button onclick="restartGame()">
-      Jogar Novamente
-    </button>
-
-  </div>
-
-</div>
 
 <script>
 
@@ -397,89 +318,48 @@ const artworks = [
 
   {
     id:1,
-    artist:"Impressionismo",
     image:"https://static.todamateria.com.br/upload/im/pr/impressaonascerdosol-cke.jpg"
   },
 
   {
     id:2,
-    artist:"Millet",
     image:"https://static.todamateria.com.br/upload/je/an/jeanfrancoismilletangelus-cke.jpg"
   },
 
   {
     id:3,
-    artist:"Monet",
     image:"https://www.abramus.org.br/wp-content/uploads/2011/03/dans-la-prairie-monet.jpg"
   },
 
   {
     id:4,
-    artist:"Restolhos",
     image:"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhvz1sj6wyLYGzVKxmUyk9ELju2Hv5RQdjfBP-jzeybOMjxdNnn6mn0PIaXSG2IualqsTm_rwrm9HZZzTCZZslGkSDxJgyJgmLXv-xdxtbVmd5cFsdB9qA5_opcGdVrGfO84Q9dGSbjBEfT/w1200-h630-p-k-no-nu/millet-restolhos.jpg"
-  },
-
-  {
-    id:5,
-    artist:"Van Gogh",
-    image:"https://cdn-blog.superprof.com/blog_br/wp-content/uploads/2024/05/van-gogh-impressionismo.jpg"
-  },
-
-  {
-    id:6,
-    artist:"Monet Almoço",
-    image:"https://www.historiadasartes.com/wp-content/uploads/2015/10/17.35MonetAlmoco.jpg"
   }
 
 ];
 
-const board = document.getElementById("gameBoard");
+const board =
+document.getElementById("gameBoard");
 
-const scoreText = document.getElementById("score");
+const scoreText =
+document.getElementById("score");
 
-const movesText = document.getElementById("moves");
+const levelText =
+document.getElementById("level");
 
-const timerText = document.getElementById("timer");
-
-const levelText = document.getElementById("level");
-
-const finalStats =
-document.getElementById("finalStats");
-
-const winScreen =
-document.getElementById("winScreen");
+const difficultyText =
+document.getElementById("difficulty");
 
 const restartBtn =
 document.getElementById("restartBtn");
 
-let firstCard = null;
-let secondCard = null;
+let selectedCards = [];
+
 let lockBoard = false;
 
+let matchedGroups = 0;
+
 let score = 0;
-let moves = 0;
-let matchedPairs = 0;
-
-let seconds = 0;
-let timer;
-
-function startTimer(){
-
-  timer = setInterval(() => {
-
-    seconds++;
-
-    const mins =
-    Math.floor(seconds / 60);
-
-    const secs = seconds % 60;
-
-    timerText.textContent =
-    `${String(mins).padStart(2,"0")}:${String(secs).padStart(2,"0")}`;
-
-  },1000);
-
-}
 
 function shuffleCards(array){
 
@@ -501,20 +381,29 @@ function createBoard(){
 
   board.innerHTML = "";
 
-  const amount =
+  const repeatAmount =
   levels[currentLevel];
 
-  const selectedArtworks =
-  artworks.slice(0, amount);
+  difficultyText.textContent =
+  repeatAmount;
 
-  const duplicatedCards =
-  selectedArtworks.flatMap(card => [
-    {...card},
-    {...card}
-  ]);
+  const cards =
+  artworks.flatMap(card => {
+
+    let copies = [];
+
+    for(let i = 0; i < repeatAmount; i++){
+
+      copies.push({...card});
+
+    }
+
+    return copies;
+
+  });
 
   const shuffled =
-  shuffleCards(duplicatedCards);
+  shuffleCards(cards);
 
   shuffled.forEach(cardData => {
 
@@ -532,7 +421,7 @@ function createBoard(){
       </div>
 
       <div class="back-face">
-        <img src="${cardData.image}" alt="${cardData.artist}">
+        <img src="${cardData.image}">
       </div>
 
     `;
@@ -552,162 +441,130 @@ function flipCard(){
 
   if(lockBoard) return;
 
-  if(this === firstCard) return;
+  if(this.classList.contains("flip")) return;
 
   this.classList.add("flip");
 
-  if(!firstCard){
+  selectedCards.push(this);
 
-    firstCard = this;
+  if(
+    selectedCards.length ===
+    levels[currentLevel]
+  ){
 
-    return;
+    checkForMatch();
 
   }
-
-  secondCard = this;
-
-  moves++;
-
-  movesText.textContent = moves;
-
-  checkForMatch();
 
 }
 
 function checkForMatch(){
 
+  const firstId =
+  selectedCards[0].dataset.id;
+
   const isMatch =
-  firstCard.dataset.id === secondCard.dataset.id;
+  selectedCards.every(card =>
+    card.dataset.id === firstId
+  );
 
-  isMatch
-  ? disableCards()
-  : unflipCards();
+  if(isMatch){
 
-}
+    selectedCards.forEach(card => {
 
-function disableCards(){
+      card.classList.add("matched");
 
-  firstCard.classList.add("matched");
+    });
 
-  secondCard.classList.add("matched");
+    matchedGroups++;
 
-  score += 100;
+    score += 100 * currentLevel;
 
-  matchedPairs++;
+    scoreText.textContent =
+    score;
 
-  scoreText.textContent = score;
+    selectedCards = [];
 
-  resetBoard();
+    if(
+      matchedGroups ===
+      artworks.length
+    ){
 
-  if(matchedPairs === levels[currentLevel]){
+      setTimeout(() => {
 
-    clearInterval(timer);
+        if(currentLevel < 5){
+
+          currentLevel++;
+
+          matchedGroups = 0;
+
+          levelText.textContent =
+          currentLevel;
+
+          alert(
+            `🔥 Nível ${currentLevel}\nAgora encontre ${levels[currentLevel]} imagens iguais!`
+          );
+
+          createBoard();
+
+        }else{
+
+          alert(
+            "🏆 Você zerou o jogo!"
+          );
+
+        }
+
+      },700);
+
+    }
+
+  }else{
+
+    lockBoard = true;
 
     setTimeout(() => {
 
-      if(currentLevel < 5){
+      selectedCards.forEach(card => {
 
-        currentLevel++;
+        card.classList.remove("flip");
 
-        levelText.textContent =
-        currentLevel;
+      });
 
-        alert(
-          `🔥 Você avançou para o nível ${currentLevel}!`
-        );
+      selectedCards = [];
 
-        restartGame();
+      lockBoard = false;
 
-      }else{
-
-        winScreen.style.display = "flex";
-
-        finalStats.innerHTML = `
-          🏆 Você zerou o jogo!<br><br>
-          ⏱ Tempo: ${timerText.textContent}<br>
-          🎯 Tentativas: ${moves}<br>
-          🏆 Pontuação: ${score}
-        `;
-
-      }
-
-    },800);
+    },1000);
 
   }
-
-}
-
-function unflipCards(){
-
-  lockBoard = true;
-
-  setTimeout(() => {
-
-    firstCard.classList.remove("flip");
-
-    secondCard.classList.remove("flip");
-
-    resetBoard();
-
-  },1000);
-
-}
-
-function resetBoard(){
-
-  [firstCard, secondCard] =
-  [null, null];
-
-  lockBoard = false;
 
 }
 
 function restartGame(){
 
-  clearInterval(timer);
+  currentLevel = 1;
 
-  firstCard = null;
-  secondCard = null;
+  matchedGroups = 0;
 
-  lockBoard = false;
+  score = 0;
 
-  moves = 0;
-  matchedPairs = 0;
+  selectedCards = [];
 
-  seconds = 0;
+  scoreText.textContent = "0";
 
-  movesText.textContent = "0";
-  timerText.textContent = "00:00";
-
-  levelText.textContent =
-  currentLevel;
-
-  winScreen.style.display = "none";
+  levelText.textContent = "1";
 
   createBoard();
-
-  startTimer();
 
 }
 
 restartBtn.addEventListener(
   "click",
-  () => {
-
-    currentLevel = 1;
-
-    score = 0;
-
-    scoreText.textContent = "0";
-
-    restartGame();
-
-  }
+  restartGame
 );
 
 createBoard();
-
-startTimer();
 
 </script>
 
