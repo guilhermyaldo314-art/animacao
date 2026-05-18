@@ -350,6 +350,11 @@ header p{
     <h2 id="moves">0</h2>
   </div>
 
+  <div class="card-info">
+    <span>🔥 Nível</span>
+    <h2 id="level">1</h2>
+  </div>
+
   <button id="restartBtn">
     🔄 Reiniciar
   </button>
@@ -377,6 +382,16 @@ header p{
 </div>
 
 <script>
+
+let currentLevel = 1;
+
+const levels = {
+  1:2,
+  2:3,
+  3:4,
+  4:5,
+  5:6
+};
 
 const artworks = [
 
@@ -425,6 +440,8 @@ const scoreText = document.getElementById("score");
 const movesText = document.getElementById("moves");
 
 const timerText = document.getElementById("timer");
+
+const levelText = document.getElementById("level");
 
 const finalStats =
 document.getElementById("finalStats");
@@ -484,8 +501,14 @@ function createBoard(){
 
   board.innerHTML = "";
 
+  const amount =
+  levels[currentLevel];
+
+  const selectedArtworks =
+  artworks.slice(0, amount);
+
   const duplicatedCards =
-  artworks.flatMap(card => [
+  selectedArtworks.flatMap(card => [
     {...card},
     {...card}
   ]);
@@ -576,19 +599,37 @@ function disableCards(){
 
   resetBoard();
 
-  if(matchedPairs === artworks.length){
+  if(matchedPairs === levels[currentLevel]){
 
     clearInterval(timer);
 
     setTimeout(() => {
 
-      winScreen.style.display = "flex";
+      if(currentLevel < 5){
 
-      finalStats.innerHTML = `
-        ⏱ Tempo: ${timerText.textContent}<br>
-        🎯 Tentativas: ${moves}<br>
-        🏆 Pontuação: ${score}
-      `;
+        currentLevel++;
+
+        levelText.textContent =
+        currentLevel;
+
+        alert(
+          `🔥 Você avançou para o nível ${currentLevel}!`
+        );
+
+        restartGame();
+
+      }else{
+
+        winScreen.style.display = "flex";
+
+        finalStats.innerHTML = `
+          🏆 Você zerou o jogo!<br><br>
+          ⏱ Tempo: ${timerText.textContent}<br>
+          🎯 Tentativas: ${moves}<br>
+          🏆 Pontuação: ${score}
+        `;
+
+      }
 
     },800);
 
@@ -630,15 +671,16 @@ function restartGame(){
 
   lockBoard = false;
 
-  score = 0;
   moves = 0;
   matchedPairs = 0;
 
   seconds = 0;
 
-  scoreText.textContent = "0";
   movesText.textContent = "0";
   timerText.textContent = "00:00";
+
+  levelText.textContent =
+  currentLevel;
 
   winScreen.style.display = "none";
 
@@ -650,7 +692,17 @@ function restartGame(){
 
 restartBtn.addEventListener(
   "click",
-  restartGame
+  () => {
+
+    currentLevel = 1;
+
+    score = 0;
+
+    scoreText.textContent = "0";
+
+    restartGame();
+
+  }
 );
 
 createBoard();
