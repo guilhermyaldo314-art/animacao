@@ -1,41 +1,321 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Salvar a Terra</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Memória Artística PRO</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
 
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
 body{
-margin:0;
-overflow:hidden;
-background:black;
-font-family:Arial;
-color:white;
+  min-height:100vh;
+
+  background:
+  radial-gradient(circle at top,#1e293b,#020617);
+
+  font-family:'Poppins',sans-serif;
+
+  color:white;
+
+  overflow-x:hidden;
 }
 
-#menu,#gameover{
-position:fixed;
-top:50%;
-left:50%;
-transform:translate(-50%,-50%);
-text-align:center;
+.particles{
+  position:fixed;
+  inset:0;
+
+  background:
+  radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
+
+  background-size:30px 30px;
+
+  animation:moveBg 10s linear infinite;
+
+  z-index:-1;
 }
 
-button{
-padding:15px 30px;
-font-size:20px;
-border:none;
-border-radius:10px;
-cursor:pointer;
+@keyframes moveBg{
+
+  from{
+    transform:translateY(0px);
+  }
+
+  to{
+    transform:translateY(30px);
+  }
+
 }
 
-#score{
-position:fixed;
-top:20px;
-left:20px;
-font-size:28px;
-display:none;
+header{
+  text-align:center;
+
+  padding:40px 20px 20px;
+}
+
+header h1{
+  font-size:3rem;
+
+  margin-bottom:10px;
+
+  background:
+  linear-gradient(90deg,#60a5fa,#ffffff);
+
+  -webkit-background-clip:text;
+
+  -webkit-text-fill-color:transparent;
+}
+
+header p{
+  color:#cbd5e1;
+}
+
+.dashboard{
+  width:95%;
+  max-width:1200px;
+
+  margin:auto;
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  gap:20px;
+
+  flex-wrap:wrap;
+}
+
+.card-info{
+  width:200px;
+
+  padding:20px;
+
+  background:rgba(255,255,255,0.08);
+
+  border:1px solid rgba(255,255,255,0.1);
+
+  backdrop-filter:blur(15px);
+
+  border-radius:25px;
+
+  box-shadow:0 8px 25px rgba(0,0,0,0.4);
+
+  text-align:center;
+}
+
+.card-info span{
+  display:block;
+
+  margin-bottom:10px;
+
+  color:#cbd5e1;
+}
+
+.card-info h2{
+  font-size:2rem;
+}
+
+#restartBtn{
+  padding:18px 30px;
+
+  border:none;
+
+  border-radius:20px;
+
+  background:
+  linear-gradient(135deg,#2563eb,#1d4ed8);
+
+  color:white;
+
+  font-size:1rem;
+  font-weight:600;
+
+  cursor:pointer;
+
+  transition:0.3s;
+}
+
+#restartBtn:hover{
+  transform:translateY(-3px);
+}
+
+.game-board{
+  width:95%;
+  max-width:1200px;
+
+  margin:40px auto;
+
+  display:grid;
+
+  grid-template-columns:repeat(4,1fr);
+
+  gap:20px;
+}
+
+.memory-card{
+  position:relative;
+
+  width:100%;
+  height:220px;
+
+  transform-style:preserve-3d;
+
+  transition:transform 0.7s;
+
+  cursor:pointer;
+}
+
+.memory-card.flip{
+  transform:rotateY(180deg);
+}
+
+.front-face,
+.back-face{
+  position:absolute;
+
+  width:100%;
+  height:100%;
+
+  border-radius:25px;
+
+  overflow:hidden;
+
+  backface-visibility:hidden;
+}
+
+.front-face{
+  background:
+  linear-gradient(135deg,#2563eb,#1e40af);
+
+  display:flex;
+  justify-content:center;
+  align-items:center;
+
+  font-size:4rem;
+
+  box-shadow:0 10px 25px rgba(0,0,0,0.5);
+}
+
+.back-face{
+  transform:rotateY(180deg);
+
+  background:white;
+}
+
+.back-face img{
+  width:100%;
+  height:100%;
+
+  object-fit:cover;
+}
+
+.memory-card.matched{
+  animation:matchedGlow 1s infinite alternate;
+
+  pointer-events:none;
+}
+
+@keyframes matchedGlow{
+
+  from{
+    box-shadow:0 0 10px #22c55e;
+  }
+
+  to{
+    box-shadow:0 0 30px #22c55e;
+  }
+
+}
+
+.win-screen{
+  position:fixed;
+  inset:0;
+
+  background:rgba(0,0,0,0.85);
+
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
+
+.win-box{
+  width:90%;
+  max-width:500px;
+
+  padding:40px;
+
+  border-radius:30px;
+
+  background:#0f172a;
+
+  text-align:center;
+}
+
+.win-box h2{
+  font-size:3rem;
+
+  margin-bottom:20px;
+}
+
+.win-box p{
+  margin-bottom:20px;
+
+  color:#cbd5e1;
+}
+
+.results{
+  margin-bottom:20px;
+
+  line-height:2;
+}
+
+.win-box button{
+  padding:18px 35px;
+
+  border:none;
+
+  border-radius:20px;
+
+  background:#22c55e;
+
+  color:white;
+
+  cursor:pointer;
+}
+
+@media(max-width:900px){
+
+  .game-board{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+}
+
+@media(max-width:650px){
+
+  .game-board{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .memory-card{
+    height:180px;
+  }
+
+  header h1{
+    font-size:2.2rem;
+  }
+
 }
 
 </style>
@@ -43,334 +323,339 @@ display:none;
 
 <body>
 
-<div id="menu">
-<h1>🌍 Salve a Terra</h1>
-<button onclick="startGame()">Jogar</button>
+<div class="particles"></div>
+
+<header>
+
+  <h1>🎨 Memória Artística PRO</h1>
+
+  <p>Impressionismo & Realismo</p>
+
+</header>
+
+<section class="dashboard">
+
+  <div class="card-info">
+    <span>⏱ Tempo</span>
+    <h2 id="timer">00:00</h2>
+  </div>
+
+  <div class="card-info">
+    <span>🏆 Pontos</span>
+    <h2 id="score">0</h2>
+  </div>
+
+  <div class="card-info">
+    <span>🎯 Tentativas</span>
+    <h2 id="moves">0</h2>
+  </div>
+
+  <button id="restartBtn">
+    🔄 Reiniciar
+  </button>
+
+</section>
+
+<section class="game-board" id="gameBoard"></section>
+
+<div class="win-screen" id="winScreen">
+
+  <div class="win-box">
+
+    <h2>🏆 Vitória!</h2>
+
+    <p>Você encontrou todos os pares.</p>
+
+    <div class="results" id="finalStats"></div>
+
+    <button onclick="restartGame()">
+      Jogar Novamente
+    </button>
+
+  </div>
+
 </div>
-
-<div id="score">Score: 0</div>
-
-<div id="gameover" style="display:none;">
-<h1>💥 A Terra Explodiu</h1>
-<button onclick="restartGame()">Jogar Novamente</button>
-</div>
-
-<canvas id="game"></canvas>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
 <script>
 
-// CENA
+const artworks = [
 
-const scene = new THREE.Scene()
+  {
+    id:1,
+    artist:"Impressionismo",
+    image:"https://static.todamateria.com.br/upload/im/pr/impressaonascerdosol-cke.jpg"
+  },
 
-const camera = new THREE.PerspectiveCamera(
-75,
-window.innerWidth/window.innerHeight,
-0.1,
-1000
-)
+  {
+    id:2,
+    artist:"Millet",
+    image:"https://static.todamateria.com.br/upload/je/an/jeanfrancoismilletangelus-cke.jpg"
+  },
 
-const renderer = new THREE.WebGLRenderer({
-canvas:document.querySelector("#game")
-})
+  {
+    id:3,
+    artist:"Monet",
+    image:"https://www.abramus.org.br/wp-content/uploads/2011/03/dans-la-prairie-monet.jpg"
+  },
 
-renderer.setSize(window.innerWidth,window.innerHeight)
+  {
+    id:4,
+    artist:"Restolhos",
+    image:"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhvz1sj6wyLYGzVKxmUyk9ELju2Hv5RQdjfBP-jzeybOMjxdNnn6mn0PIaXSG2IualqsTm_rwrm9HZZzTCZZslGkSDxJgyJgmLXv-xdxtbVmd5cFsdB9qA5_opcGdVrGfO84Q9dGSbjBEfT/w1200-h630-p-k-no-nu/millet-restolhos.jpg"
+  },
 
-camera.position.z=20
+  {
+    id:5,
+    artist:"Van Gogh",
+    image:"https://cdn-blog.superprof.com/blog_br/wp-content/uploads/2024/05/van-gogh-impressionismo.jpg"
+  },
 
+  {
+    id:6,
+    artist:"Monet Almoço",
+    image:"https://www.historiadasartes.com/wp-content/uploads/2015/10/17.35MonetAlmoco.jpg"
+  }
 
-// LUZ
+];
 
-const light=new THREE.PointLight(0xffffff,2)
-light.position.set(10,10,10)
-scene.add(light)
+const board = document.getElementById("gameBoard");
 
+const scoreText = document.getElementById("score");
 
-// TERRA
+const movesText = document.getElementById("moves");
 
-const earthGeo=new THREE.SphereGeometry(2,32,32)
+const timerText = document.getElementById("timer");
 
-const earthMat=new THREE.MeshStandardMaterial({
-color:0x2266ff
-})
+const finalStats =
+document.getElementById("finalStats");
 
-const earth=new THREE.Mesh(earthGeo,earthMat)
+const winScreen =
+document.getElementById("winScreen");
 
-scene.add(earth)
+const restartBtn =
+document.getElementById("restartBtn");
 
+let firstCard = null;
+let secondCard = null;
+let lockBoard = false;
 
-// CONTROLE MOUSE
+let score = 0;
+let moves = 0;
+let matchedPairs = 0;
 
-document.addEventListener("mousemove",(e)=>{
+let seconds = 0;
+let timer;
 
-if(!running) return
+function startTimer(){
 
-const x=(e.clientX/window.innerWidth)*2-1
-const y=-(e.clientY/window.innerHeight)*2+1
+  timer = setInterval(() => {
 
-earth.position.x=x*10
-earth.position.y=y*6
+    seconds++;
 
-})
+    const mins =
+    Math.floor(seconds / 60);
 
+    const secs = seconds % 60;
 
-// ESTRELAS
+    timerText.textContent =
+    `${String(mins).padStart(2,"0")}:${String(secs).padStart(2,"0")}`;
 
-const starsGeo=new THREE.BufferGeometry()
-const starVerts=[]
-
-for(let i=0;i<5000;i++){
-
-starVerts.push(
-(Math.random()-0.5)*1000,
-(Math.random()-0.5)*1000,
-(Math.random()-0.5)*1000
-)
-
-}
-
-starsGeo.setAttribute(
-"position",
-new THREE.Float32BufferAttribute(starVerts,3)
-)
-
-const starsMat=new THREE.PointsMaterial({color:0xffffff})
-
-const stars=new THREE.Points(starsGeo,starsMat)
-
-scene.add(stars)
-
-
-// METEOROS
-
-let meteors=[]
-let meteorBaseSpeed=0.05
-
-function spawnMeteor(){
-
-if(!running) return
-
-const geo=new THREE.SphereGeometry(1,16,16)
-
-const mat=new THREE.MeshStandardMaterial({
-color:0x777777
-})
-
-const meteor=new THREE.Mesh(geo,mat)
-
-meteor.position.x=(Math.random()-0.5)*20
-meteor.position.y=15
-
-meteor.speed=meteorBaseSpeed+Math.random()*0.05
-
-scene.add(meteor)
-
-meteors.push(meteor)
+  },1000);
 
 }
 
-setInterval(spawnMeteor,1800)
+function shuffleCards(array){
 
+  for(let i = array.length -1; i > 0; i--){
 
-// MÍSSEIS
+    const j =
+    Math.floor(Math.random() * (i + 1));
 
-let missiles=[]
+    [array[i], array[j]] =
+    [array[j], array[i]];
 
-function shootMissile(target){
+  }
 
-const geo=new THREE.CylinderGeometry(0.1,0.1,1,8)
-
-const mat=new THREE.MeshBasicMaterial({
-color:0xff0000
-})
-
-const missile=new THREE.Mesh(geo,mat)
-
-missile.position.x=earth.position.x
-missile.position.y=earth.position.y
-
-missile.target=target
-
-missile.speed=0.08 // BEM LENTO
-
-scene.add(missile)
-
-missiles.push(missile)
+  return array;
 
 }
 
+function createBoard(){
 
-// EXPLOSÃO
+  board.innerHTML = "";
 
-let particles=[]
+  const duplicatedCards =
+  artworks.flatMap(card => [
+    {...card},
+    {...card}
+  ]);
 
-function createExplosion(x,y){
+  const shuffled =
+  shuffleCards(duplicatedCards);
 
-for(let i=0;i<200;i++){
+  shuffled.forEach(cardData => {
 
-const geo=new THREE.SphereGeometry(0.1,8,8)
+    const card =
+    document.createElement("div");
 
-const mat=new THREE.MeshBasicMaterial({
-color:0xffaa00
-})
+    card.classList.add("memory-card");
 
-const p=new THREE.Mesh(geo,mat)
+    card.dataset.id = cardData.id;
 
-p.position.set(x,y,0)
+    card.innerHTML = `
 
-p.vx=(Math.random()-0.5)*1
-p.vy=(Math.random()-0.5)*1
+      <div class="front-face">
+        🎨
+      </div>
 
-scene.add(p)
+      <div class="back-face">
+        <img src="${cardData.image}" alt="${cardData.artist}">
+      </div>
 
-particles.push(p)
+    `;
+
+    card.addEventListener(
+      "click",
+      flipCard
+    );
+
+    board.appendChild(card);
+
+  });
 
 }
 
+function flipCard(){
+
+  if(lockBoard) return;
+
+  if(this === firstCard) return;
+
+  this.classList.add("flip");
+
+  if(!firstCard){
+
+    firstCard = this;
+
+    return;
+
+  }
+
+  secondCard = this;
+
+  moves++;
+
+  movesText.textContent = moves;
+
+  checkForMatch();
+
 }
 
+function checkForMatch(){
 
-// COLISÃO
+  const isMatch =
+  firstCard.dataset.id === secondCard.dataset.id;
 
-function collision(a,b){
-
-const dx=a.position.x-b.position.x
-const dy=a.position.y-b.position.y
-
-const dist=Math.sqrt(dx*dx+dy*dy)
-
-return dist<2
+  isMatch
+  ? disableCards()
+  : unflipCards();
 
 }
 
+function disableCards(){
 
-// JOGO
+  firstCard.classList.add("matched");
 
-let score=0
-let level=1
-let running=false
+  secondCard.classList.add("matched");
 
-const scoreUI=document.getElementById("score")
+  score += 100;
 
-function startGame(){
+  matchedPairs++;
 
-document.getElementById("menu").style.display="none"
+  scoreText.textContent = score;
 
-scoreUI.style.display="block"
+  resetBoard();
 
-running=true
+  if(matchedPairs === artworks.length){
+
+    clearInterval(timer);
+
+    setTimeout(() => {
+
+      winScreen.style.display = "flex";
+
+      finalStats.innerHTML = `
+        ⏱ Tempo: ${timerText.textContent}<br>
+        🎯 Tentativas: ${moves}<br>
+        🏆 Pontuação: ${score}
+      `;
+
+    },800);
+
+  }
+
+}
+
+function unflipCards(){
+
+  lockBoard = true;
+
+  setTimeout(() => {
+
+    firstCard.classList.remove("flip");
+
+    secondCard.classList.remove("flip");
+
+    resetBoard();
+
+  },1000);
+
+}
+
+function resetBoard(){
+
+  [firstCard, secondCard] =
+  [null, null];
+
+  lockBoard = false;
 
 }
 
 function restartGame(){
 
-location.reload()
+  clearInterval(timer);
+
+  firstCard = null;
+  secondCard = null;
+
+  lockBoard = false;
+
+  score = 0;
+  moves = 0;
+  matchedPairs = 0;
+
+  seconds = 0;
+
+  scoreText.textContent = "0";
+  movesText.textContent = "0";
+  timerText.textContent = "00:00";
+
+  winScreen.style.display = "none";
+
+  createBoard();
+
+  startTimer();
 
 }
 
+restartBtn.addEventListener(
+  "click",
+  restartGame
+);
 
-// LOOP
+createBoard();
 
-function animate(){
-
-requestAnimationFrame(animate)
-
-if(running){
-
-score+=0.1
-
-level=Math.floor(score/500)+1
-
-scoreUI.innerText="Score: "+Math.floor(score)+" | Level: "+level
-
-meteorBaseSpeed=0.05+score*0.00005
-
-}
-
-earth.rotation.y+=0.01
-
-
-// METEOROS
-
-meteors.forEach((m,i)=>{
-
-m.position.y-=m.speed
-
-// se estiver perto da terra dispara defesa
-const dx=earth.position.x-m.position.x
-const dy=earth.position.y-m.position.y
-const dist=Math.sqrt(dx*dx+dy*dy)
-
-if(dist<6 && running && Math.random()<0.02){
-
-shootMissile(m)
-
-}
-
-if(collision(earth,m)&&running){
-
-running=false
-
-createExplosion(earth.position.x,earth.position.y)
-
-earth.visible=false
-
-document.getElementById("gameover").style.display="block"
-
-}
-
-})
-
-
-// MOVER MÍSSEIS
-
-missiles.forEach((ms,mi)=>{
-
-if(!ms.target) return
-
-const dx=ms.target.position.x-ms.position.x
-const dy=ms.target.position.y-ms.position.y
-
-ms.position.x+=dx*0.02
-ms.position.y+=dy*0.02
-
-if(collision(ms,ms.target)){
-
-createExplosion(ms.target.position.x,ms.target.position.y)
-
-scene.remove(ms.target)
-
-meteors=meteors.filter(m=>m!==ms.target)
-
-scene.remove(ms)
-
-missiles.splice(mi,1)
-
-score+=20
-
-}
-
-})
-
-
-// PARTÍCULAS
-
-particles.forEach((p)=>{
-
-p.position.x+=p.vx
-p.position.y+=p.vy
-
-})
-
-stars.rotation.y+=0.0005
-
-renderer.render(scene,camera)
-
-}
-
-animate()
+startTimer();
 
 </script>
 
