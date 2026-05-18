@@ -21,104 +21,54 @@
 
 body{
   min-height:100vh;
-
   background:
   radial-gradient(circle at top,#1e293b,#020617);
-
   font-family:'Poppins',sans-serif;
-
   color:white;
-
-  overflow-x:hidden;
-}
-
-.particles{
-  position:fixed;
-  inset:0;
-
-  background:
-  radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px);
-
-  background-size:30px 30px;
-
-  animation:moveBg 10s linear infinite;
-
-  z-index:-1;
-}
-
-@keyframes moveBg{
-
-  from{
-    transform:translateY(0px);
-  }
-
-  to{
-    transform:translateY(30px);
-  }
-
 }
 
 header{
   text-align:center;
-
   padding:40px 20px 20px;
 }
 
 header h1{
   font-size:3rem;
-
   margin-bottom:10px;
 
   background:
   linear-gradient(90deg,#60a5fa,#ffffff);
 
   -webkit-background-clip:text;
-
   -webkit-text-fill-color:transparent;
-}
-
-header p{
-  color:#cbd5e1;
 }
 
 .dashboard{
   width:95%;
   max-width:1200px;
-
   margin:auto;
 
   display:flex;
   justify-content:center;
   align-items:center;
-
   gap:20px;
-
   flex-wrap:wrap;
 }
 
 .card-info{
-  width:200px;
-
+  width:180px;
   padding:20px;
 
   background:rgba(255,255,255,0.08);
 
-  border:1px solid rgba(255,255,255,0.1);
-
-  backdrop-filter:blur(15px);
-
   border-radius:25px;
-
-  box-shadow:0 8px 25px rgba(0,0,0,0.4);
 
   text-align:center;
 }
 
 .card-info span{
   display:block;
-
   margin-bottom:10px;
-
   color:#cbd5e1;
 }
 
@@ -126,28 +76,16 @@ header p{
   font-size:2rem;
 }
 
-#restartBtn{
+button{
   padding:18px 30px;
-
   border:none;
-
   border-radius:20px;
 
   background:
   linear-gradient(135deg,#2563eb,#1d4ed8);
 
   color:white;
-
-  font-size:1rem;
-  font-weight:600;
-
   cursor:pointer;
-
-  transition:0.3s;
-}
-
-#restartBtn:hover{
-  transform:translateY(-3px);
 }
 
 .game-board{
@@ -166,12 +104,11 @@ header p{
 .memory-card{
   position:relative;
 
-  width:100%;
   height:220px;
 
   transform-style:preserve-3d;
 
-  transition:transform 0.7s;
+  transition:0.7s;
 
   cursor:pointer;
 }
@@ -203,50 +140,27 @@ header p{
   align-items:center;
 
   font-size:4rem;
-
-  box-shadow:0 10px 25px rgba(0,0,0,0.5);
 }
 
 .back-face{
   transform:rotateY(180deg);
-
   background:white;
 }
 
 .back-face img{
   width:100%;
   height:100%;
-
   object-fit:cover;
 }
 
 .memory-card.matched{
-  animation:matchedGlow 1s infinite alternate;
-
   pointer-events:none;
+
+  box-shadow:
+  0 0 25px #22c55e;
 }
 
-@keyframes matchedGlow{
-
-  from{
-    box-shadow:0 0 10px #22c55e;
-  }
-
-  to{
-    box-shadow:0 0 30px #22c55e;
-  }
-
-}
-
-@media(max-width:900px){
-
-  .game-board{
-    grid-template-columns:repeat(3,1fr);
-  }
-
-}
-
-@media(max-width:650px){
+@media(max-width:700px){
 
   .game-board{
     grid-template-columns:repeat(2,1fr);
@@ -256,10 +170,6 @@ header p{
     height:180px;
   }
 
-  header h1{
-    font-size:2.2rem;
-  }
-
 }
 
 </style>
@@ -267,13 +177,9 @@ header p{
 
 <body>
 
-<div class="particles"></div>
-
 <header>
 
   <h1>🎨 Memória Artística PRO</h1>
-
-  <p>Encontre grupos de imagens iguais</p>
 
 </header>
 
@@ -285,13 +191,13 @@ header p{
   </div>
 
   <div class="card-info">
-    <span>🎯 Nível</span>
+    <span>🔥 Nível</span>
     <h2 id="level">1</h2>
   </div>
 
   <div class="card-info">
-    <span>🧩 Iguais</span>
-    <h2 id="difficulty">2</h2>
+    <span>🧠 Combinação</span>
+    <h2 id="combo">2</h2>
   </div>
 
   <button id="restartBtn">
@@ -303,16 +209,6 @@ header p{
 <section class="game-board" id="gameBoard"></section>
 
 <script>
-
-let currentLevel = 1;
-
-const levels = {
-  1:2,
-  2:3,
-  3:4,
-  4:5,
-  5:6
-};
 
 const artworks = [
 
@@ -333,10 +229,30 @@ const artworks = [
 
   {
     id:4,
-    image:"https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEhvz1sj6wyLYGzVKxmUyk9ELju2Hv5RQdjfBP-jzeybOMjxdNnn6mn0PIaXSG2IualqsTm_rwrm9HZZzTCZZslGkSDxJgyJgmLXv-xdxtbVmd5cFsdB9qA5_opcGdVrGfO84Q9dGSbjBEfT/w1200-h630-p-k-no-nu/millet-restolhos.jpg"
+    image:"https://cdn-blog.superprof.com/blog_br/wp-content/uploads/2024/05/van-gogh-impressionismo.jpg"
   }
 
 ];
+
+const levels = {
+
+  1:2,
+  2:3,
+  3:4,
+  4:5,
+  5:6
+
+};
+
+let currentLevel = 1;
+
+let selectedCards = [];
+
+let matchedGroups = 0;
+
+let lockBoard = false;
+
+let score = 0;
 
 const board =
 document.getElementById("gameBoard");
@@ -347,21 +263,10 @@ document.getElementById("score");
 const levelText =
 document.getElementById("level");
 
-const difficultyText =
-document.getElementById("difficulty");
+const comboText =
+document.getElementById("combo");
 
-const restartBtn =
-document.getElementById("restartBtn");
-
-let selectedCards = [];
-
-let lockBoard = false;
-
-let matchedGroups = 0;
-
-let score = 0;
-
-function shuffleCards(array){
+function shuffle(array){
 
   for(let i = array.length -1; i > 0; i--){
 
@@ -381,38 +286,40 @@ function createBoard(){
 
   board.innerHTML = "";
 
-  const repeatAmount =
+  matchedGroups = 0;
+
+  selectedCards = [];
+
+  comboText.textContent =
   levels[currentLevel];
 
-  difficultyText.textContent =
-  repeatAmount;
+  const cards = [];
 
-  const cards =
-  artworks.flatMap(card => {
+  artworks.forEach(art => {
 
-    let copies = [];
+    for(
+      let i = 0;
+      i < levels[currentLevel];
+      i++
+    ){
 
-    for(let i = 0; i < repeatAmount; i++){
-
-      copies.push({...card});
+      cards.push({...art});
 
     }
 
-    return copies;
-
   });
 
-  const shuffled =
-  shuffleCards(cards);
+  shuffle(cards);
 
-  shuffled.forEach(cardData => {
+  cards.forEach(cardData => {
 
     const card =
     document.createElement("div");
 
     card.classList.add("memory-card");
 
-    card.dataset.id = cardData.id;
+    card.dataset.id =
+    cardData.id;
 
     card.innerHTML = `
 
@@ -452,23 +359,23 @@ function flipCard(){
     levels[currentLevel]
   ){
 
-    checkForMatch();
+    checkMatch();
 
   }
 
 }
 
-function checkForMatch(){
+function checkMatch(){
 
-  const firstId =
+  const id =
   selectedCards[0].dataset.id;
 
-  const isMatch =
+  const matched =
   selectedCards.every(card =>
-    card.dataset.id === firstId
+    card.dataset.id === id
   );
 
-  if(isMatch){
+  if(matched){
 
     selectedCards.forEach(card => {
 
@@ -478,7 +385,8 @@ function checkForMatch(){
 
     matchedGroups++;
 
-    score += 100 * currentLevel;
+    score +=
+    100 * currentLevel;
 
     scoreText.textContent =
     score;
@@ -496,13 +404,11 @@ function checkForMatch(){
 
           currentLevel++;
 
-          matchedGroups = 0;
-
           levelText.textContent =
           currentLevel;
 
           alert(
-            `🔥 Nível ${currentLevel}\nAgora encontre ${levels[currentLevel]} imagens iguais!`
+            `🔥 Agora cada imagem terá ${levels[currentLevel]} cartas iguais!`
           );
 
           createBoard();
@@ -545,21 +451,19 @@ function restartGame(){
 
   currentLevel = 1;
 
-  matchedGroups = 0;
-
   score = 0;
 
-  selectedCards = [];
+  levelText.textContent = 1;
 
-  scoreText.textContent = "0";
-
-  levelText.textContent = "1";
+  scoreText.textContent = 0;
 
   createBoard();
 
 }
 
-restartBtn.addEventListener(
+document
+.getElementById("restartBtn")
+.addEventListener(
   "click",
   restartGame
 );
